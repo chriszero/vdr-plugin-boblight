@@ -132,5 +132,7 @@ int cBoblight::sendOptions() {
   sprintf(buf, "%s %s", "interpolation", cfg.interpolation ? "true" : "false");
   boblight_setoption(m_boblight, -1, buf);
 
+  boblight_setpriority(m_boblight, cfg.priority);
+
   return success;
 }

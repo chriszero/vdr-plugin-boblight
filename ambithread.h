@@ -51,6 +51,7 @@ class cAmbiThread : public cThread, public cAmbiService
       int grabImage();
       int detectCineBars();
       int putData();
+      int softhddeviceNotDetached();
 
       // data
 	cBoblight bob;

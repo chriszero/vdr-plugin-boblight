@@ -76,7 +76,14 @@ void cAmbiThread::Action()
    {
       MsTime start = msNow();
 
-      // work ...
+      if(softhddeviceNotDetached() == fail)
+      {
+         bob.close();
+         waitCondition.TimedWait(mutex, 1000);
+         continue;
+      }
+
+      // Softhddevice is not detached, work...
       if(bob.ping() == success) {
 
          if(cfg.dirty > 0) {
@@ -84,32 +91,52 @@ void cAmbiThread::Action()
             bob.sendOptions();
          }
 
-         if (cfg.viewMode == vmAtmo)
+         switch(cfg.viewMode) 
          {
-            if (grabImage() == success)
-            {
-               detectCineBars();
-               putData();
+            case vmAtmo:
+               if (grabImage() == success)
+               {
+                  detectCineBars();
+                  putData();
 
-               MsTime elapsed = msNow() - start;
-               wait = 1000 / cfg.frequence - elapsed;
-               tell(3, "sleeping %ldms (%d Hz)", wait, cfg.frequence);
-            }
-            else
-            {
-               wait = 10000;   // retry softhd grab every 10 seconds
-            }
-         }
-         else
-         {
-            putData();
-            wait = 500; // less load on fixed color or black 
+                  MsTime elapsed = msNow() - start;
+                  wait = 1000 / cfg.frequence - elapsed;
+                  tell(3, "sleeping %ldms (%d Hz)", wait, cfg.frequence);
+               }
+               else
+               {
+                  wait = 10000;   // retry softhd grab every 10 seconds
+               }
+               break;
+            
+            case vmBlack:
+            case vmFixedCol:
+               putData();
+               wait = 500; // less load on fixed color or black 
+               break;
+            
+            case vmDetached:
+               bob.close();
+               wait = 1000;
+               break;
+
+            default:
+               break;
          }
       }
       else { // Connection lost, reconnect
-         bob.close();
-         bob.open();
          wait = 10000;
+         switch(cfg.viewMode) 
+         {            
+            case vmDetached:
+               bob.close();
+               break;
+
+            default:
+               bob.close();
+               bob.open();
+               wait = 5000;
+         }
       }
 
       waitCondition.TimedWait(mutex, wait);  // wait time in ms
@@ -119,6 +146,30 @@ void cAmbiThread::Action()
    loopActive = false;
 
    tell(0, "boblight thread ended (pid=%d)", getpid());
+}
+
+int cAmbiThread::softhddeviceNotDetached()
+{
+   cPlugin* softHdPlugin = cPluginManager::GetPlugin("softhddevice");
+   if(!softHdPlugin)
+   {
+      error("Can't find softhddevice");
+      return fail;
+   }
+   int reply_code = 0;
+   cString reply_msg;
+   reply_msg = softHdPlugin->SVDRPCommand("STAT", "", reply_code);
+
+   if(910 == reply_code)
+   {
+      tell(1, "Softhddevice NOT detached: %d", reply_code);
+      return success;
+   }
+   else 
+   {
+      tell(1, "Softhddevice detached: %d", reply_code);
+      return fail;
+   }
 }
 
 //***************************************************************************
