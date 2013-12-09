@@ -191,7 +191,7 @@ int cAmbiThread::grabImage()
                    softHdPlugin ? "service" : "plugin");
  
    // grab image at sofhddevice
-   req.width = -64; //warum? steht hier => http://projects.vdr-developer.org/projects/plg-softhddevice/repository/revisions/master/entry/video.c#L7372
+   req.width = 64;
    req.height = 64;
    req.img = 0;
 

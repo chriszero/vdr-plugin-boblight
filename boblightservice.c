@@ -81,13 +81,14 @@ int cBoblight::ping() {
 
 int cBoblight::writePix(int *rgb)
 {
+   tell(2, "writePix r:%d g:%d b:%d", rgb[0], rgb[1], rgb[2]);
    boblight_addpixel(m_boblight, -1, rgb);
 
    return success;
 }
 
 int cBoblight::writeColor(int *rgb, int x, int y)
-{   
+{ 
 	boblight_addpixelxy(m_boblight, x, y, rgb);
 
    return success;
@@ -96,7 +97,7 @@ int cBoblight::writeColor(int *rgb, int x, int y)
 int cBoblight::send() {
 	if (!boblight_sendrgb(m_boblight, 0, NULL))
     {
-      //m_error = boblight_geterror(m_boblight);
+      tell(1, "Error sendrgb boblight %s", boblight_geterror(m_boblight));
       return fail;
     }
 	return success;
@@ -111,16 +112,16 @@ int cBoblight::sendOptions() {
   if (m_boblight == 0) return fail;
   char buf[32];
 
-  sprintf(buf, "%s %1f", "value", cfg.value * 0.01);
+  sprintf(buf, "%s %1f", "value", cfg.value * 0.1f);
   boblight_setoption(m_boblight, -1, buf);
 
   sprintf(buf, "%s %d", "threshold", cfg.threshold);
   boblight_setoption(m_boblight, -1, buf);
 
-  sprintf(buf, "%s %.1f", "gamma", cfg.gamma * 0.01);
+  sprintf(buf, "%s %.1f", "gamma", cfg.gamma * 0.1f);
   boblight_setoption(m_boblight, -1, buf);
 
-  sprintf(buf, "%s %1f", "saturation", cfg.saturation * 0.01);
+  sprintf(buf, "%s %1f", "saturation", cfg.saturation * 0.1f);
   boblight_setoption(m_boblight, -1, buf);
 
   sprintf(buf, "%s %d", "speed", cfg.speed);
