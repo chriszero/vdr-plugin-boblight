@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #define BOBLIGHT_DLOPEN
-#include "lib/boblight.h"
+#include <libboblight/boblight.h>
 #include "boblightservice.h"
 
 cBoblight::cBoblight()
