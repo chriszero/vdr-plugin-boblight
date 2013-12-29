@@ -11,7 +11,8 @@ PLUGIN = vdrboblight
 
 ### The version number of this plugin (taken from the main source file):
 
-VERSION = $(shell grep 'static const char \*VERSION *=' DVBAPI.h | awk '{ print $$6 }' | sed -e 's/[";]//g')
+#VERSION = $(shell grep 'static const char \*VERSION *=' vdrboblight.h | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION := $(shell git describe --abbrev=4 --dirty --always)
 
 ### The directory environment:
 
@@ -78,10 +79,12 @@ INCLUDES += -I$(VDRSRC)/include
 endif
 
 DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+### Define GITVERSION used in vdrboblight.c
+DEFINES += -DGITVERSION='"$(VERSION)"'
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o ambithread.o ambiservice.o boblightservice.o common.o config.o
+OBJS = $(patsubst %.c,%.o,$(wildcard *.c))
 
 ### The main target:
 

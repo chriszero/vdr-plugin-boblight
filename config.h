@@ -48,13 +48,14 @@ class cBobConfig : public cAmbiService
 
       // technical
 
-      ViewMode viewMode;
+      int viewMode;
+      int startupViewMode;
       int fixedR;
       int fixedG;
       int fixedB;
 
       int showMainmenu; //bool
-      Cinebars detectCineBars;
+      int detectCineBars;
 
       int loglevel;
 

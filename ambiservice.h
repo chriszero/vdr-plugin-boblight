@@ -47,4 +47,4 @@ class cAmbiService
       static const char* viewModes[];
 };
 
-#endif // __SEDU_SERVICE_H
+#endif // __AMBI_SERVICE_H

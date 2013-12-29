@@ -28,9 +28,7 @@ const char* cAmbiService::viewModes[] =
    "atmo",
    "fixed color",
    "black",
-   "detached",
-
-   0
+   "detached"
 };
 
 const char* cAmbiService::toName(ViewMode vm)
