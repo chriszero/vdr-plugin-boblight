@@ -61,8 +61,8 @@ class cAmbiThread : public cThread, public cAmbiService
       int loopActive;
 
       Pixel* image;
-      int cineBarsHor;
-      int cineBarsVer;
+      int xBarHeight;
+      int yBarWidth;
       int imageSize;
       int imageWidth;
       int imageHeight;

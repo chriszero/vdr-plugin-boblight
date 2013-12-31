@@ -47,6 +47,7 @@ cBobConfig::cBobConfig()
    priority = 128;
 
    detectCineBars = cbBoth;
+   cineBarsThreshold = 20;
    
    loglevel = 0;
 

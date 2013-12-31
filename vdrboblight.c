@@ -85,6 +85,7 @@ void cPluginBoblight::Save() {
    SetupStore("StartupViewMode", cfg.startupViewMode);
 
    SetupStore("DetectCineBars", cfg.detectCineBars);
+   SetupStore("CineBarsThreshold", cfg.cineBarsThreshold);
 
    SetupStore("Updaterate", cfg.frequence);
    SetupStore("Threshold", cfg.threshold);
@@ -135,6 +136,7 @@ bool cPluginBoblight::SetupParse(const char* Name, const char* Value)
    }
 
    else if (!strcasecmp(Name, "DetectCineBars"))   cfg.detectCineBars = (cAmbiService::Cinebars)atoi(Value);
+   else if (!strcasecmp(Name, "CineBarsThreshold"))        cfg.cineBarsThreshold = atoi(Value);
 
    else if (!strcasecmp(Name, "Frequence"))        cfg.frequence = atoi(Value);
    else if (!strcasecmp(Name, "Threshold"))        cfg.threshold = atoi(Value);

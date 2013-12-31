@@ -56,6 +56,7 @@ class cBobConfig : public cAmbiService
 
       int showMainmenu; //bool
       int detectCineBars;
+      int cineBarsThreshold;
 
       int loglevel;
 

@@ -37,8 +37,8 @@ cAmbiThread::cAmbiThread()
    imageSize = 0;
    imageWidth = 0;
    imageHeight = 0;
-   cineBarsHor = 0;
-   cineBarsVer = 0;
+   xBarHeight = 0;
+   yBarWidth = 0;
 }
 
 cAmbiThread::~cAmbiThread()
@@ -66,6 +66,7 @@ void cAmbiThread::Action()
 {
    MsTime wait = 0;
    MsTime lastPing = 0;
+   MsTime lastBoarderDetect = 0;
    int lastPingResult = na;
    cMutexLock lock(&mutex);
 
@@ -104,7 +105,11 @@ void cAmbiThread::Action()
             case vmAtmo:
                if (grabImage() == success)
                {
-                  detectCineBars();
+                  if(start - lastBoarderDetect > 5000) {
+                     lastBoarderDetect = start;
+                     detectCineBars();
+                  }
+                                    
                   putData();
 
                   MsTime elapsed = msNow() - start;
@@ -222,101 +227,67 @@ int cAmbiThread::grabImage()
 
 int cAmbiThread::detectCineBars()
 {
-   const int threshold = 3;    // threshold for black level of cine bars
+   /*
+      Annahme: Wenn im mittleren oberen und unterem Drittel des Bildes alle aufeinander folgenden Pixel schwarz sind
+      haben wir einen Horizontalen Balken.
+
+      |0|x x|0|
+      |y|0 0|y|
+      |y|0 0|y|
+      |0|x x|0|
+
+   */
    Pixel* p;
-   int off;
 
-   // check horizontal bars
+   const int xOffset = imageWidth / 4;
+   const int yOffset = imageHeight / 4;
 
-   if (cfg.detectCineBars == cbHorizontal || cfg.detectCineBars == cbBoth)
-   {
-      for (off = 0; off < imageHeight/5; off++)  // cinebar height max 1/5 of the screen height
-      {
-         int above = 0;
-         
-         for (int x = 0; x < imageWidth; x++)
-         {
-            p = &image[off*imageWidth + x];
-            
-            if (p->r > threshold || p->g > threshold || p->b > threshold)
-               above++;
-            
-            p = &image[((imageHeight-1)-off)*imageWidth + x];
-            
-            if (p->r > threshold || p->g > threshold || p->b > threshold)
-               above++;
-         }
-         
-         if (above > imageWidth/8)              // max 1/8 failed pixel
-            break;
-      }
-      
-      if (cineBarsHor != off)
-      {
-         static int last = 0;
-         static int count = 0;
-
-         if (off != last)
-         {
-            last = off;
-            count = 0;
-         }
-
-         if (count++ >= cfg.frequence)
-         {
-            count = 0;
-            cineBarsHor = off;
-            tell(0, "Switch horizontal cine bars to %d", cineBarsHor);
-         }
-      }
-   }
-
-   // check vertical bars
+   xBarHeight = 0;
+   yBarWidth = 0;
    
-   if (cfg.detectCineBars == cbVertical || cfg.detectCineBars == cbBoth)
-   {
-      for (off = 0; off < imageWidth/5; off++)    // cinebar height max 1/5 of the screen width
-      {
-         int above = 0;
-         
-         for (int y = 0; y < imageHeight; y++)
-         {
-            p = &image[y*imageWidth + off];
-            
-            if (p->r > threshold || p->g > threshold || p->b > threshold)
-               above++;
-            
-            p = &image[y*imageWidth + ((imageWidth-1)-off)];
-            
-            if (p->r > threshold || p->g > threshold || p->b > threshold)
-            above++;
+
+   if (cfg.detectCineBars == cbHorizontal || cfg.detectCineBars == cbBoth) {
+      // check for xBar
+      for (int y = 0; y < yOffset; y++) {
+         int row = imageWidth * y;
+         int xBarCount = 0;
+         for (int x = xOffset; x < imageWidth - xOffset; x++) {
+
+            p = &image[row + x];
+            if(p->isBlack(cfg.cineBarsThreshold)) {
+               xBarCount++;
+            }
          }
-         
-         if (above > imageHeight/6)         // max 1/6 failed pixel
+         if(xBarCount == imageWidth - (2*xOffset)){
+            xBarHeight++;
+         }
+         else {
             break;
-      }
-      
-      if (cineBarsVer != off)
-      {
-         static int last = 0;
-         static int count = 0;
-
-         if (off != last)
-         {
-            last = off;
-            count = 0;
-         }
-
-         if (count++ >= cfg.frequence)
-         {
-            count = 0;
-
-            cineBarsVer = off;
-            tell(0, "Switch vertical cine bars to %d", cineBarsVer);
          }
       }
    }
 
+   if (cfg.detectCineBars == cbVertical || cfg.detectCineBars == cbBoth) {
+      // check for yBar
+      for (int x = 0; x < xOffset; x++) {
+         int yBarCount = 0;
+         for (int y = yOffset; y < imageHeight - yOffset; y++) {
+            int row = imageWidth * y;
+            p = &image[row + x];
+            if(p->isBlack(cfg.cineBarsThreshold)) {
+               yBarCount++;
+            }
+         }
+         if(yBarCount == imageHeight - (2*yOffset) ){
+            yBarWidth++;
+         }
+         else {
+            break;
+         }
+      }
+   }
+
+   tell(1, "Black border detection horBar: %d verBar: %d", xBarHeight, yBarWidth);
    return done;
 }
 
@@ -344,24 +315,22 @@ int cAmbiThread::putData()
 
    	for (int y = 0; y < imageHeight; y++) {
    		// skip horizontal cinebars
-         if(y < cineBarsHor) continue;
-         if(y > imageHeight - cineBarsHor) continue;
+         if(y < xBarHeight || y > imageHeight - xBarHeight) continue;
 
          int rgb[3];
    		row = imageWidth * y;
    		for (int x = 0; x < imageWidth; x++) {
             // skip vertical cinebars
-            if(x < cineBarsVer) continue;
-            if(x > imageWidth - cineBarsVer) continue;
+            if(x < yBarWidth || x > imageWidth - yBarWidth) continue;
 
    			p = &image[row + x];
    			rgb[0] = p->r;
    			rgb[1] = p->g;
    			rgb[2] = p->b;
-   			bob.writeColor(rgb, x - cineBarsVer, y - cineBarsHor); 
+   			bob.writeColor(rgb, x - yBarWidth, y - xBarHeight); 
    		}
    	}
-      bob.setScanRange(imageWidth - (2*cineBarsVer), imageHeight - (2*cineBarsHor));
+      bob.setScanRange(imageWidth - (2*yBarWidth), imageHeight - (2*xBarHeight));
    }
 
    bob.send();
