@@ -65,6 +65,8 @@ void cAmbiThread::Stop()
 void cAmbiThread::Action()
 {
    MsTime wait = 0;
+   MsTime lastPing = 0;
+   int lastPingResult = na;
    cMutexLock lock(&mutex);
 
    tell(0, "boblight Thread started (pid=%d)", getpid());
@@ -83,8 +85,14 @@ void cAmbiThread::Action()
          continue;
       }
 
+      // Reduce load, just ping every second
+      if(start - lastPing > 1000) {
+         lastPing = start;
+         lastPingResult = bob.ping();
+      }
+
       // Softhddevice is not detached, work...
-      if(bob.ping() == success) {
+      if(lastPingResult == success) {
 
          if(cfg.dirty > 0) {
             cfg.dirty = 0;

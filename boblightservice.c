@@ -56,9 +56,11 @@ int cBoblight::open()
 
 int cBoblight::close()
 {
-  tell(1, "Destroying boblight");
-  boblight_destroy(m_boblight);   // calls delete *void
-  m_boblight = 0;                 // set pointer to 0
+  if(m_boblight != 0) {
+    tell(1, "Destroying boblight");
+    boblight_destroy(m_boblight);   // calls delete *void
+    m_boblight = 0;     
+  }            // set pointer to 0
   return success;
 }
 
