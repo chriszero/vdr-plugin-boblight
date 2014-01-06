@@ -12,7 +12,7 @@ PLUGIN = vdrboblight
 ### The version number of this plugin (taken from the main source file):
 
 #VERSION = $(shell grep 'static const char \*VERSION *=' vdrboblight.h | awk '{ print $$6 }' | sed -e 's/[";]//g')
-VERSION := $(shell git describe --abbrev=4 --dirty --always)
+VERSION := $(shell git describe --tags master)
 
 ### The directory environment:
 
