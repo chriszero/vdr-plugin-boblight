@@ -14,6 +14,7 @@ cBoblightPluginMenu::cBoblightPluginMenu(const char* title, cPluginBoblight* aPl
 }
 
 void cBoblightPluginMenu::Create(void) {
+   SetMenuCategory(mcPluginSetup);
    Clear();
 
    Add(new cMenuEditStraItem(tr("View Mode"), &cfg.viewMode, cAmbiService::vmCount, cAmbiService::viewModes));

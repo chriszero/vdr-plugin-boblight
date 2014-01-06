@@ -30,7 +30,8 @@ void cAmbiSetup::Setup()
 
    Add(new cMenuEditIntItem(tr("Updaterate [Hz]"), &cfg.frequence, 1, 100));
 
-   Add(new cMenuEditStraItem(tr("Detect black borders"), &cfg.detectCineBars, 3, cineBars));
+   Add(new cMenuEditStraItem(tr("Detect black borders"), &cfg.detectCineBars, cAmbiService::cbCount, cAmbiService::cineBars));
+
    Add(new cMenuEditIntItem(tr("Black border detection Threshold (0-255)"), &cfg.cineBarsThreshold, 0, 255));
 
    Add(new cMenuEditIntItem(tr("Threshold (0-255)"), &cfg.threshold, 0, 255));

@@ -31,7 +31,10 @@ const char* cAmbiService::viewModes[] =
    "detached"
 };
 
-const char* cAmbiService::toName(ViewMode vm)
+const char* cAmbiService::cineBars[] =
 {
-   return viewModes[vm];
-}
+   "None",
+   "Horizontal",
+   "Vertical",
+   "Both"
+};

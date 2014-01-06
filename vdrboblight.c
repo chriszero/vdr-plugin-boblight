@@ -138,7 +138,7 @@ bool cPluginBoblight::SetupParse(const char* Name, const char* Value)
    else if (!strcasecmp(Name, "DetectCineBars"))   cfg.detectCineBars = (cAmbiService::Cinebars)atoi(Value);
    else if (!strcasecmp(Name, "CineBarsThreshold"))        cfg.cineBarsThreshold = atoi(Value);
 
-   else if (!strcasecmp(Name, "Frequence"))        cfg.frequence = atoi(Value);
+   else if (!strcasecmp(Name, "Updaterate"))        cfg.frequence = atoi(Value);
    else if (!strcasecmp(Name, "Threshold"))        cfg.threshold = atoi(Value);
    else if (!strcasecmp(Name, "Value"))            cfg.value = atoi(Value);
    else if (!strcasecmp(Name, "Saturation"))       cfg.saturation = atoi(Value);
@@ -146,6 +146,7 @@ bool cPluginBoblight::SetupParse(const char* Name, const char* Value)
    else if (!strcasecmp(Name, "Autospeed"))        cfg.autospeed = atoi(Value);
    else if (!strcasecmp(Name, "Interpolation"))    cfg.interpolation = atoi(Value);
    else if (!strcasecmp(Name, "Priority"))         cfg.priority = atoi(Value);
+   else if (!strcasecmp(Name, "Gamma"))            cfg.gamma = atoi(Value);
 
 
    else if (!strcasecmp(Name, "FixedColorRed"))    cfg.fixedR = atoi(Value);

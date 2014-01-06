@@ -31,14 +31,9 @@ struct Pixel
 	unsigned char r;
 	unsigned char a;
 
-	int isBlack(int threshold = 3) {
-
-		if (r > threshold || g > threshold || b > threshold) {
-			return false;
-		}
-		return true;
+	inline int isBlack(int threshold) {
+		return (r < threshold || g < threshold || b < threshold);
 	}
-
 };
 
 #endif

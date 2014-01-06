@@ -39,6 +39,15 @@ cAmbiThread::cAmbiThread()
    imageHeight = 0;
    xBarHeight = 0;
    yBarWidth = 0;
+   lastxBarHeight = 0;
+   lastyBarWidth = 0;
+   barsChanged = true;
+
+   softHdPlugin = cPluginManager::GetPlugin("softhddevice");
+   int softHdGrabService = (softHdPlugin && softHdPlugin->Service(ATMO1_GRAB_SERVICE, 0));
+
+   if (!softHdGrabService)
+      error("Can't find softhddevice %s!", softHdPlugin ? "service" : "plugin");
 }
 
 cAmbiThread::~cAmbiThread()
@@ -163,12 +172,6 @@ void cAmbiThread::Action()
 
 int cAmbiThread::softhddeviceNotDetached()
 {
-   cPlugin* softHdPlugin = cPluginManager::GetPlugin("softhddevice");
-   if(!softHdPlugin)
-   {
-      error("Can't find softhddevice");
-      return fail;
-   }
    int reply_code = 0;
    cString reply_msg;
    reply_msg = softHdPlugin->SVDRPCommand("STAT", "", reply_code);
@@ -196,13 +199,6 @@ int cAmbiThread::grabImage()
    free(image);
    image = 0;
 
-   cPlugin* softHdPlugin = cPluginManager::GetPlugin("softhddevice");
-   int softHdGrabService = (softHdPlugin && softHdPlugin->Service(ATMO1_GRAB_SERVICE, 0));
-
-   if (!softHdGrabService)
-      return error("Can't find softhddevice %s, aborting grab, retrying in 10 seconds!", 
-                   softHdPlugin ? "service" : "plugin");
- 
    // grab image at sofhddevice
    req.width = 64;
    req.height = 64;
@@ -237,29 +233,32 @@ int cAmbiThread::detectCineBars()
       |0|x x|0|
 
    */
-   Pixel* p;
+   if (cfg.detectCineBars == cbNone) {
+      return done;
+   }
 
+   Pixel* p;
    const int xOffset = imageWidth / 4;
    const int yOffset = imageHeight / 4;
 
-   xBarHeight = 0;
-   yBarWidth = 0;
+   int tempxBarHeight = 0;
+   int tempyBarWidth = 0;
    
 
    if (cfg.detectCineBars == cbHorizontal || cfg.detectCineBars == cbBoth) {
       // check for xBar
-      for (int y = 0; y < yOffset; y++) {
+      for (int y = 0; y < yOffset; ++y) {
          int row = imageWidth * y;
          int xBarCount = 0;
-         for (int x = xOffset; x < imageWidth - xOffset; x++) {
+         for (int x = xOffset; x < imageWidth - xOffset; ++x) {
 
             p = &image[row + x];
             if(p->isBlack(cfg.cineBarsThreshold)) {
-               xBarCount++;
+               ++xBarCount;
             }
          }
          if(xBarCount == imageWidth - (2*xOffset)){
-            xBarHeight++;
+            ++tempxBarHeight;
          }
          else {
             break;
@@ -269,17 +268,18 @@ int cAmbiThread::detectCineBars()
 
    if (cfg.detectCineBars == cbVertical || cfg.detectCineBars == cbBoth) {
       // check for yBar
-      for (int x = 0; x < xOffset; x++) {
+      for (int x = 0; x < xOffset; ++x) {
          int yBarCount = 0;
-         for (int y = yOffset; y < imageHeight - yOffset; y++) {
+         for (int y = yOffset; y < imageHeight - yOffset; ++y) {
+
             int row = imageWidth * y;
             p = &image[row + x];
             if(p->isBlack(cfg.cineBarsThreshold)) {
-               yBarCount++;
+               ++yBarCount;
             }
          }
          if(yBarCount == imageHeight - (2*yOffset) ){
-            yBarWidth++;
+            ++tempyBarWidth;
          }
          else {
             break;
@@ -287,9 +287,22 @@ int cAmbiThread::detectCineBars()
       }
    }
 
-   tell(1, "Black border detection horBar: %d verBar: %d", xBarHeight, yBarWidth);
+   if (tempxBarHeight != lastxBarHeight || tempyBarWidth != lastyBarWidth) {
+      barsChanged = true;
+      xBarHeight = tempxBarHeight;
+      yBarWidth = tempyBarWidth;
+   }
+   else {
+      barsChanged = false;
+   }
+
+   lastxBarHeight = tempxBarHeight;
+   lastyBarWidth = tempyBarWidth;
+
+   if(barsChanged) tell(1, "V2 Black border detection horBar: %d verBar: %d", xBarHeight, yBarWidth);
    return done;
 }
+
 
 //***************************************************************************
 // Put Data
@@ -310,8 +323,7 @@ int cAmbiThread::putData()
    else if(cfg.viewMode == vmAtmo) {
 
    	int row = 0;
-      Pixel pixel = {0,0,0,0};
-      Pixel* p = &pixel;
+      Pixel* p;
 
    	for (int y = 0; y < imageHeight; y++) {
    		// skip horizontal cinebars
@@ -330,7 +342,10 @@ int cAmbiThread::putData()
    			bob.writeColor(rgb, x - yBarWidth, y - xBarHeight); 
    		}
    	}
-      bob.setScanRange(imageWidth - (2*yBarWidth), imageHeight - (2*xBarHeight));
+      if (barsChanged) {
+         bob.setScanRange(imageWidth - (2*yBarWidth), imageHeight - (2*xBarHeight));
+         barsChanged = false;
+      }
    }
 
    bob.send();

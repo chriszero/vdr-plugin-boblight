@@ -25,7 +25,8 @@ class cAmbiService
    public:
 
       enum Cinebars
-      {
+      {  
+         cbNone,
          cbHorizontal,
          cbVertical,
          cbBoth,
@@ -42,9 +43,8 @@ class cAmbiService
       };
 
       // static
-
-      static const char* toName(ViewMode vm);
       static const char* viewModes[];
+      static const char* cineBars[];
 };
 
 #endif // __AMBI_SERVICE_H

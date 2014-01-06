@@ -56,6 +56,8 @@ class cAmbiThread : public cThread, public cAmbiService
       // data
 	cBoblight bob;
 
+      cPlugin* softHdPlugin;
+
       cMutex mutex;
       cCondVar waitCondition;
       int loopActive;
@@ -63,6 +65,12 @@ class cAmbiThread : public cThread, public cAmbiService
       Pixel* image;
       int xBarHeight;
       int yBarWidth;
+
+      int lastxBarHeight;
+      int lastyBarWidth;
+
+      bool barsChanged;
+
       int imageSize;
       int imageWidth;
       int imageHeight;
