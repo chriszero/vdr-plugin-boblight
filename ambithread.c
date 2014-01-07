@@ -292,9 +292,6 @@ int cAmbiThread::detectCineBars()
       xBarHeight = tempxBarHeight;
       yBarWidth = tempyBarWidth;
    }
-   else {
-      barsChanged = false;
-   }
 
    lastxBarHeight = tempxBarHeight;
    lastyBarWidth = tempyBarWidth;
