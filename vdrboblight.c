@@ -198,6 +198,22 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          ReplyCode = 550;
          return "stripes detached";
       }
+      else if(!Option || !strlen(Option)) {
+         switch(cfg.viewMode) {
+           case cAmbiService::vmAtmo:
+                  ReplyCode = 551;
+                  return "atmo mode";
+           case cAmbiService::vmFixedCol:
+                  ReplyCode = 552;
+                  return "fixed color";
+           case cAmbiService::vmBlack:
+                  ReplyCode = 553;
+                  return "stripes black";
+           case cAmbiService::vmDetached:
+                  ReplyCode = 554;
+                  return "stripes detached";
+         }
+      }
       else
       {
          ReplyCode = 901;
