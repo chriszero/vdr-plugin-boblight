@@ -20,6 +20,7 @@
 #include <queue>
 
 #include <vdr/thread.h>
+#include <vdr/shutdown.h>
 
 #include "common.h"
 #include "config.h"

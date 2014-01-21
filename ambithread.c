@@ -88,7 +88,7 @@ void cAmbiThread::Action()
    {
       MsTime start = msNow();
 
-      if(softhddeviceNotDetached() == fail)
+      if(ShutdownHandler.IsUserInactive() || softhddeviceNotDetached() == fail)
       {
          bob.close();
          waitCondition.TimedWait(mutex, 1000);
