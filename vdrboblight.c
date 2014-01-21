@@ -173,14 +173,14 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          cfg.viewMode = cAmbiService::vmAtmo;
          startAtmo();
          ReplyCode = 550;
-         return "atmo mode activated";
+         return "atmo";
       }
       else if (Option && strcasecmp(Option, "fixed") == 0) 
       {
          cfg.viewMode = cAmbiService::vmFixedCol;
          startAtmo();
          ReplyCode = 550;
-         return "fixed color activated";
+         return "fixed";
       }
       else if (Option && strcasecmp(Option, "black") == 0) 
       {
@@ -188,7 +188,7 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          startAtmo();
          
          ReplyCode = 550;
-         return "stripes black";
+         return "black";
       }
       else if (Option && strcasecmp(Option, "detach") == 0) 
       {
@@ -196,22 +196,22 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          stopAtmo();
          
          ReplyCode = 550;
-         return "stripes detached";
+         return "detach";
       }
       else if(!Option || !strlen(Option)) {
          switch(cfg.viewMode) {
            case cAmbiService::vmAtmo:
                   ReplyCode = 551;
-                  return "atmo mode";
+                  return "atmo";
            case cAmbiService::vmFixedCol:
                   ReplyCode = 552;
-                  return "fixed color";
+                  return "fixed";
            case cAmbiService::vmBlack:
                   ReplyCode = 553;
-                  return "stripes black";
+                  return "black";
            case cAmbiService::vmDetached:
                   ReplyCode = 554;
-                  return "stripes detached";
+                  return "detach";
          }
       }
       else
