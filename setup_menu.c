@@ -28,7 +28,7 @@ void cAmbiSetup::Setup()
    Add(new cMenuEditIntItem(tr("Log level"), &cfg.loglevel, 0, 3));
    Add(new cMenuEditBoolItem(tr("Show mainmenu"), &cfg.showMainmenu));
 
-   Add(new cMenuEditIntItem(tr("Updaterate [Hz]"), &cfg.frequence, 1, 100));
+   Add(new cMenuEditIntItem(tr("Updaterate [Hz]"), &cfg.frequence, 1, 15));
 
    Add(new cMenuEditStraItem(tr("Detect black borders"), &cfg.detectCineBars, cAmbiService::cbCount, cAmbiService::cineBars));
 

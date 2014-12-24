@@ -38,3 +38,11 @@ const char* cAmbiService::cineBars[] =
    "Vertical",
    "Both"
 };
+
+const char* cAmbiService::osd3dModes[] =
+{
+   "Auto",
+   "Off",
+   "H-SBS",
+   "H-OU"
+};

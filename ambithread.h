@@ -51,6 +51,7 @@ class cAmbiThread : public cThread, public cAmbiService
 
       int grabImage();
       int detectCineBars();
+      int getOsd3DMode();
       int putData();
       int softhddeviceNotDetached();
 
@@ -69,8 +70,11 @@ class cAmbiThread : public cThread, public cAmbiService
 
       int lastxBarHeight;
       int lastyBarWidth;
+      
+      int osd3DMode;
 
       bool barsChanged;
+      bool osd3dChanged;
 
       int imageSize;
       int imageWidth;

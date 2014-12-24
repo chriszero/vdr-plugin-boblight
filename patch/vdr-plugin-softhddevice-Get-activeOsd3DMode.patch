@@ -1,0 +1,99 @@
+From a4ba63b99d517d050c4d7b6fb963c9f7e2cd0f4b Mon Sep 17 00:00:00 2001
+From: chriszero <zerov83@gmail.com>
+Date: Tue, 23 Dec 2014 19:51:12 +0100
+Subject: [PATCH] Get active Osd3DMode.
+
+---
+ softhddevice.cpp       | 13 +++++++++++++
+ softhddevice_service.h |  7 +++++++
+ video.c                | 10 ++++++++++
+ video.h                |  3 +++
+ 4 files changed, 33 insertions(+)
+
+diff --git a/softhddevice.cpp b/softhddevice.cpp
+index b3467a5..a9c319f 100644
+--- a/softhddevice.cpp
++++ b/softhddevice.cpp
+@@ -3153,6 +3153,19 @@ bool cPluginSoftHdDevice::Service(const char *id, void *data)
+ {
+     //dsyslog("[softhddev]%s: id %s\n", __FUNCTION__, id);
+ 
++	if (strcmp(id, OSD1_3DMODE_SERVICE) == 0) {
++		SoftHDDevice_Osd3DModeService_v1_1_t *r;
++
++		r = (SoftHDDevice_Osd3DModeService_v1_1_t *) data;
++		if (r->GetMode) {
++			r->Mode = VideoGetOsd3DMode();
++		}
++		else {
++			VideoSetOsd3DMode(r->Mode);
++			return true;
++		}
++    }
++    
+     if (strcmp(id, OSD_3DMODE_SERVICE) == 0) {
+ 	SoftHDDevice_Osd3DModeService_v1_0_t *r;
+ 
+diff --git a/softhddevice_service.h b/softhddevice_service.h
+index c7c2d5e..0bc40ea 100644
+--- a/softhddevice_service.h
++++ b/softhddevice_service.h
+@@ -25,6 +25,7 @@
+ #define ATMO_GRAB_SERVICE	"SoftHDDevice-AtmoGrabService-v1.0"
+ #define ATMO1_GRAB_SERVICE	"SoftHDDevice-AtmoGrabService-v1.1"
+ #define OSD_3DMODE_SERVICE	"SoftHDDevice-Osd3DModeService-v1.0"
++#define OSD1_3DMODE_SERVICE	"SoftHDDevice-Osd3DModeService-v1.1"
+ 
+ enum
+ { GRAB_IMG_RGBA_FORMAT_B8G8R8A8 };
+@@ -52,6 +53,12 @@ typedef struct
+ 
+ typedef struct
+ {
++    int Mode;
++    bool GetMode;
++} SoftHDDevice_Osd3DModeService_v1_1_t;
++
++typedef struct
++{
+     // request/reply data
+ 
+     int width;
+diff --git a/video.c b/video.c
+index 7f47f5e..5281492 100644
+--- a/video.c
++++ b/video.c
+@@ -9664,6 +9664,16 @@ void VideoSetOsdSize(int width, int height)
+ }
+ 
+ ///
++///	Set active 3d OSD mode.
++///
++///	@return mode	OSD mode (0=off, 1=SBS, 2=Top Bottom)
++///
++int VideoGetOsd3DMode(void)
++{
++    return Osd3DMode;
++}
++
++///
+ ///	Set the 3d OSD mode.
+ ///
+ ///	@param mode	OSD mode (0=off, 1=SBS, 2=Top Bottom)
+diff --git a/video.h b/video.h
+index fa3e44f..3822f8d 100644
+--- a/video.h
++++ b/video.h
+@@ -179,6 +179,9 @@ extern void VideoSetOsdSize(int, int);
+     /// Set Osd 3D Mode
+ extern void VideoSetOsd3DMode(int);
+ 
++    /// Get Osd 3D Mode
++extern int VideoGetOsd3DMode(void);
++
+     /// Set video clock.
+ extern void VideoSetClock(VideoHwDecoder *, int64_t);
+ 
+-- 
+1.9.1
+

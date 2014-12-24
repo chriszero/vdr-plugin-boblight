@@ -36,7 +36,7 @@ cBobConfig cfg;
 cBobConfig::cBobConfig()
 {
    // to be configured
-   frequence = 25;
+   frequence = 15;
    threshold = 20;
    gamma = 10;
    value = 80;
@@ -56,6 +56,7 @@ cBobConfig::cBobConfig()
    fixedR = 111;
    fixedG = 101;
    fixedB = 0;
+   osd3DMode = osdAuto;
 
    dirty = 0;
 }

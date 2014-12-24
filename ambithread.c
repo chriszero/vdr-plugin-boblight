@@ -42,12 +42,18 @@ cAmbiThread::cAmbiThread()
    lastxBarHeight = 0;
    lastyBarWidth = 0;
    barsChanged = true;
+   osd3dChanged = true;
 
    softHdPlugin = cPluginManager::GetPlugin("softhddevice");
    int softHdGrabService = (softHdPlugin && softHdPlugin->Service(ATMO1_GRAB_SERVICE, 0));
 
    if (!softHdGrabService)
       error("Can't find softhddevice %s!", softHdPlugin ? "service" : "plugin");
+   
+   int softHd3DOsdServive = (softHdPlugin && softHdPlugin->Service(OSD1_3DMODE_SERVICE, 0));
+
+   if (!softHd3DOsdServive)
+		tell(1, "Can't find softhddevice 3D OsdMode Service 1.1, 3D detection will not work!");
 }
 
 cAmbiThread::~cAmbiThread()
@@ -117,6 +123,7 @@ void cAmbiThread::Action()
                   if(start - lastBoarderDetect > 5000) {
                      lastBoarderDetect = start;
                      detectCineBars();
+					 getOsd3DMode();
                   }
                                     
                   putData();
@@ -217,6 +224,53 @@ int cAmbiThread::grabImage()
    return success;
 }
 
+int cAmbiThread::getOsd3DMode()
+{
+	if(osd3dChanged) return osd3DMode;
+	
+	switch(cfg.osd3DMode) {
+		case osdAuto:
+			SoftHDDevice_Osd3DModeService_v1_1_t req;
+			req.GetMode = true;
+			if (!softHdPlugin->Service(OSD1_3DMODE_SERVICE, &req)) {
+				tempOsd3DMode = osdOff;
+				cfg.osd3DMode = osdOff;
+			}
+			
+			// (0=off, 1=SBS, 2=Top Bottom)
+			int tempOsd3DMode;
+			switch (req.Mode) {
+				case 0:
+					tempOsd3DMode = osdOff;
+					break;
+				case 1:
+					tempOsd3DMode = osdHSBS;
+					break;
+				case 2:
+					tempOsd3DMode = osdHOU;
+					break;
+				default:
+					tempOsd3DMode = osdOff;
+			}
+			if(tempOsd3DMode != osd3DMode) {
+				osd3dChanged = true;
+				osd3DMode = tempOsd3DMode;
+			}
+			break;
+		case osdOff:
+		case osdHSBS:
+		case osdHOU:
+			if(osd3DMode != cfg.osd3DMode) {
+				osd3dChanged = true;
+				osd3DMode = cfg.osd3DMode;
+			}
+		default:
+			break;
+	}
+	
+	return osd3DMode;
+}
+
 //***************************************************************************
 // Detect Cine Bars
 //***************************************************************************
@@ -233,7 +287,7 @@ int cAmbiThread::detectCineBars()
       |0|x x|0|
 
    */
-   if (cfg.detectCineBars == cbNone) {
+   if (cfg.detectCineBars == cbNone || barsChanged) {
       return done;
    }
 
@@ -325,12 +379,16 @@ int cAmbiThread::putData()
    	for (int y = 0; y < imageHeight; y++) {
    		// skip horizontal cinebars
          if(y < xBarHeight || y > imageHeight - xBarHeight) continue;
+         
+         if (osd3DMode == osdHOU && y > (imageHeight/2) ) continue; // (0=off, 1=SBS, 2=Top Bottom)
 
-         int rgb[3];
+        int rgb[3];
    		row = imageWidth * y;
    		for (int x = 0; x < imageWidth; x++) {
             // skip vertical cinebars
             if(x < yBarWidth || x > imageWidth - yBarWidth) continue;
+            
+            if (osd3DMode == osdHSBS && x > (imageWidth/2) ) continue; // (0=off, 1=SBS, 2=Top Bottom)
 
    			p = &image[row + x];
    			rgb[0] = p->r;
@@ -339,9 +397,19 @@ int cAmbiThread::putData()
    			bob.writeColor(rgb, x - yBarWidth, y - xBarHeight); 
    		}
    	}
-      if (barsChanged) {
-         bob.setScanRange(imageWidth - (2*yBarWidth), imageHeight - (2*xBarHeight));
-         barsChanged = false;
+      if (barsChanged || osd3dChanged) {
+		 int width = imageWidth - (2*yBarWidth);
+		 int height = imageHeight - (2*xBarHeight);
+		 if(osd3DMode == 1) {
+			 width = width/2;
+		 }
+		 else if(osd3DMode == 2) {
+			 height = height/2;
+		 }
+         bob.setScanRange(width, height);
+         
+         if (barsChanged) barsChanged = false;
+         if (osd3dChanged) osd3dChanged = false;
       }
    }
 

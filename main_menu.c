@@ -17,6 +17,7 @@ void cBoblightPluginMenu::Create(void) {
    SetMenuCategory(mcPluginSetup);
    Clear();
 
+   Add(new cMenuEditStraItem(tr("3D Mode"), &cfg.osd3dMode, cAmbiService::osdCount, cAmbiService::osd3dModes));
    Add(new cMenuEditStraItem(tr("View Mode"), &cfg.viewMode, cAmbiService::vmCount, cAmbiService::viewModes));
    Add(new cMenuEditStraItem(tr("Startup View Mode"), &cfg.startupViewMode, cAmbiService::vmCount, cAmbiService::viewModes));
 

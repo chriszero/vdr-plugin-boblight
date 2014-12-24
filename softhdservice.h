@@ -22,7 +22,8 @@
 
 #pragma once
 
-#define ATMO1_GRAB_SERVICE	"SoftHDDevice-AtmoGrabService-v1.1" 
+#define ATMO1_GRAB_SERVICE	"SoftHDDevice-AtmoGrabService-v1.1"
+#define OSD1_3DMODE_SERVICE	"SoftHDDevice-Osd3DModeService-v1.1"
 
 struct SoftHDDevice_AtmoGrabService_v1_1_t
 {
@@ -35,4 +36,10 @@ struct SoftHDDevice_AtmoGrabService_v1_1_t
 
     int size;
     void* img;
+};
+
+struct SoftHDDevice_Osd3DModeService_v1_1_t
+{
+    int Mode;
+    bool GetMode;
 };

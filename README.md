@@ -9,7 +9,7 @@ Needs libboblight.so and boblightd configured and running (https://code.google.c
 
 
 Priority [128]			Every boblight client has a priority, the higher the lower		
-Updaterate [25]			Updaterate in Hz, 25 => 25 Updates per second from softhddevice. Boblightd has it's own updaterate, so this could be lowered
+Updaterate [15]			Updaterate in Hz, 15 => 15 Updates per second from softhddevice. Boblightd has it's own updaterate which "smoothenings" the output. Too high values have a massive impact on cpu load!
 Detect cinema bars
 Show mainmenu
 Log level

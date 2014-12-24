@@ -41,10 +41,20 @@ class cAmbiService
          vmDetached,
          vmCount
       };
+      
+      enum Osd3dMode
+      {
+         osdAuto,
+         osdOff,
+         osdHSBS,
+         osdHOU,
+         osdCount
+      };
 
       // static
       static const char* viewModes[];
       static const char* cineBars[];
+      static const char* osd3dModes[];
 };
 
 #endif // __AMBI_SERVICE_H

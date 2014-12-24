@@ -198,6 +198,34 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          ReplyCode = 550;
          return "detach";
       }
+      else if (Option && strcasecmp(Option, "3d-hsbs") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdHSBS;
+         
+         ReplyCode = 550;
+         return "3d-hsbs";
+      }
+      else if (Option && strcasecmp(Option, "3d-hou") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdHOU;
+         
+         ReplyCode = 550;
+         return "3d-hou";
+      }
+      else if (Option && strcasecmp(Option, "3d-off") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdOff;
+         
+         ReplyCode = 550;
+         return "3d-off";
+      }
+      else if (Option && strcasecmp(Option, "3d-auto") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdAuto;
+         
+         ReplyCode = 550;
+         return "3d-auto";
+      }
       else if(!Option || !strlen(Option)) {
          switch(cfg.viewMode) {
            case cAmbiService::vmAtmo:
