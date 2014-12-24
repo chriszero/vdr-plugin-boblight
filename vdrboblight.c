@@ -166,7 +166,59 @@ bool cPluginBoblight::Service(const char* Id, void* Data)
 
 cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, int &ReplyCode)
 {
-   if (!strcasecmp(Command, "MODE")) 
+   if (!strcasecmp(Command, "3D"))
+   {
+	  if (Option && strcasecmp(Option, "hsbs") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdHSBS;
+         
+         ReplyCode = 550;
+         return "3d-hsbs";
+      }
+      else if (Option && strcasecmp(Option, "hou") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdHOU;
+         
+         ReplyCode = 550;
+         return "3d-hou";
+      }
+      else if (Option && strcasecmp(Option, "off") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdOff;
+         
+         ReplyCode = 550;
+         return "3d-off";
+      }
+      else if (Option && strcasecmp(Option, "auto") == 0) 
+      {
+         cfg.osd3DMode = cAmbiService::osdAuto;
+         
+         ReplyCode = 550;
+         return "3d-auto";
+      }
+		else if(!Option || !strlen(Option)) {
+			switch(cfg.osd3DMode) {
+				case cAmbiService::osdAuto:
+					ReplyCode = 554;
+					return "auto";
+				case cAmbiService::osdOff:
+					ReplyCode = 555;
+					return "off";
+				case cAmbiService::osdHSBS:
+					ReplyCode = 556;
+					return "hsbs";
+				case cAmbiService::osdHOU:
+					ReplyCode = 557;
+					return "hou";
+			}
+		}
+		else
+		{
+			ReplyCode = 901;
+			return "Error: Unexpected option";
+		}
+   }
+   else if (!strcasecmp(Command, "MODE")) 
    {
       if (Option && strcasecmp(Option, "atmo") == 0) 
       {
@@ -197,34 +249,6 @@ cString cPluginBoblight::SVDRPCommand(const char* Command, const char* Option, i
          
          ReplyCode = 550;
          return "detach";
-      }
-      else if (Option && strcasecmp(Option, "3d-hsbs") == 0) 
-      {
-         cfg.osd3DMode = cAmbiService::osdHSBS;
-         
-         ReplyCode = 550;
-         return "3d-hsbs";
-      }
-      else if (Option && strcasecmp(Option, "3d-hou") == 0) 
-      {
-         cfg.osd3DMode = cAmbiService::osdHOU;
-         
-         ReplyCode = 550;
-         return "3d-hou";
-      }
-      else if (Option && strcasecmp(Option, "3d-off") == 0) 
-      {
-         cfg.osd3DMode = cAmbiService::osdOff;
-         
-         ReplyCode = 550;
-         return "3d-off";
-      }
-      else if (Option && strcasecmp(Option, "3d-auto") == 0) 
-      {
-         cfg.osd3DMode = cAmbiService::osdAuto;
-         
-         ReplyCode = 550;
-         return "3d-auto";
       }
       else if(!Option || !strlen(Option)) {
          switch(cfg.viewMode) {
@@ -257,7 +281,9 @@ const char** cPluginBoblight::SVDRPHelpPages(void)
    static const char* HelpPages[] = 
    {
       "MODE <mode>\n"
-      "    Set mode {atmo|fixed|black|detach}\n",
+      "    Set mode {atmo|fixed|black|detach}\n"
+      "3D <mode>\n"
+      "    Set 3D mode {auto|off|hsbs|hou}\n",
       0
    };
 

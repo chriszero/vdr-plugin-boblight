@@ -230,6 +230,7 @@ int cAmbiThread::getOsd3DMode()
 	
 	switch(cfg.osd3DMode) {
 		case osdAuto:
+			int tempOsd3DMode;
 			SoftHDDevice_Osd3DModeService_v1_1_t req;
 			req.GetMode = true;
 			if (!softHdPlugin->Service(OSD1_3DMODE_SERVICE, &req)) {
@@ -238,7 +239,6 @@ int cAmbiThread::getOsd3DMode()
 			}
 			
 			// (0=off, 1=SBS, 2=Top Bottom)
-			int tempOsd3DMode;
 			switch (req.Mode) {
 				case 0:
 					tempOsd3DMode = osdOff;
@@ -374,7 +374,10 @@ int cAmbiThread::putData()
    else if(cfg.viewMode == vmAtmo) {
 
    	int row = 0;
-      Pixel* p;
+    Pixel* p;
+	
+	int scanWidth  = 0;
+	int scanHeight = 0;
 
    	for (int y = 0; y < imageHeight; y++) {
    		// skip horizontal cinebars
@@ -394,19 +397,13 @@ int cAmbiThread::putData()
    			rgb[0] = p->r;
    			rgb[1] = p->g;
    			rgb[2] = p->b;
-   			bob.writeColor(rgb, x - yBarWidth, y - xBarHeight); 
+   			bob.writeColor(rgb, x - yBarWidth, y - xBarHeight);
+   			scanWidth = x - yBarWidth;
+   			scanHeight = y- xBarHeight;
    		}
    	}
       if (barsChanged || osd3dChanged) {
-		 int width = imageWidth - (2*yBarWidth);
-		 int height = imageHeight - (2*xBarHeight);
-		 if(osd3DMode == 1) {
-			 width = width/2;
-		 }
-		 else if(osd3DMode == 2) {
-			 height = height/2;
-		 }
-         bob.setScanRange(width, height);
+         bob.setScanRange(scanWidth, scanHeight);
          
          if (barsChanged) barsChanged = false;
          if (osd3dChanged) osd3dChanged = false;
