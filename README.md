@@ -22,3 +22,9 @@ Speed [60]				0-100 Speed is a factor for a first order lowpass filter, the high
 Autospeed [0]			0-100 Autospeed adjusts the speed on top of that based on how fast the colors are changing.
 Interpolation [true]    Interpolation is a setting for a boblightd output device, 
 						when it's on it will interpolate between the last two writes of a client. (Off might reduce load)
+
+It's recommended to add the following option to your boblight.conf
+```
+[device]
+allowsync off
+```
