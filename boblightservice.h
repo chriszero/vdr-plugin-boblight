@@ -28,7 +28,7 @@ class cBoblight : public cAmbiService
 {
    public:
 
-   cBoblight();
+   cBoblight() {};
    ~cBoblight()  { close(); }
 
    int open();

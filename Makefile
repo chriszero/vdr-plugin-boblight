@@ -14,6 +14,8 @@ PLUGIN = vdrboblight
 #VERSION = $(shell grep 'static const char \*VERSION *=' vdrboblight.h | awk '{ print $$6 }' | sed -e 's/[";]//g')
 VERSION := $(shell git describe --tags master)
 
+LIBS += -lboblight
+
 ### The directory environment:
 
 # Use package data if installed...otherwise assume we're under the VDR source directory:
@@ -111,7 +113,7 @@ $(DEPFILE): Makefile
 ### Targets:
 
 $(SOFILE): $(OBJS) $(FFDECSA)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(DECSALIB) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(DECSALIB) $(LIBS) -o $@
 
 
 install-lib: $(SOFILE)

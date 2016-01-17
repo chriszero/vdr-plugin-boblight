@@ -19,19 +19,8 @@
 
 #include <stdio.h>
 
-#define BOBLIGHT_DLOPEN
 #include <libboblight/boblight.h>
 #include "boblightservice.h"
-
-cBoblight::cBoblight()
-{
-  
-  char* boblight_error =   boblight_loadlibrary(NULL);
-  if (boblight_error)
-  {
-    error("Couldn't load libboblight");
-  }
-}
 
 //***************************************************************************
 // Open/Close
