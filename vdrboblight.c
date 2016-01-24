@@ -100,6 +100,9 @@ void cPluginBoblight::Save() {
    SetupStore("FixedColorRed", cfg.fixedR);
    SetupStore("FixedColorGreen", cfg.fixedG);
    SetupStore("FixedColorBlue", cfg.fixedB);
+	 
+	 SetupStore("Host", cfg.host);
+	 SetupStore("Port", cfg.port);
 }
 
 void cPluginBoblight::Stop(void)
@@ -152,6 +155,9 @@ bool cPluginBoblight::SetupParse(const char* Name, const char* Value)
    else if (!strcasecmp(Name, "FixedColorRed"))    cfg.fixedR = atoi(Value);
    else if (!strcasecmp(Name, "FixedColorGreen"))  cfg.fixedG = atoi(Value);
    else if (!strcasecmp(Name, "FixedColorBlue"))   cfg.fixedB = atoi(Value);
+	 
+	 else if (!strcasecmp(Name, "Host"))   					 strn0cpy(cfg.host, Value, 16);
+	 else if (!strcasecmp(Name, "Port"))					   cfg.port = atoi(Value);
 
    else
       return false;

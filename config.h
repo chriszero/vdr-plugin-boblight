@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "ambiservice.h"
+#include <vdr/tools.h>
 
 //***************************************************************************
 // Configuration
@@ -53,7 +54,9 @@ class cBobConfig : public cAmbiService
       int fixedR;
       int fixedG;
       int fixedB;
-
+			char host[16];
+			int port;
+			
       int showMainmenu; //bool
       int detectCineBars;
       int cineBarsThreshold;

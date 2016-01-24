@@ -27,6 +27,9 @@ void cAmbiSetup::Setup()
 
    Add(new cMenuEditIntItem(tr("Log level"), &cfg.loglevel, 0, 3));
    Add(new cMenuEditBoolItem(tr("Show mainmenu"), &cfg.showMainmenu));
+	 
+	 Add(new cMenuEditStrItem(tr("Boblightd host, ip"), cfg.host, 16));
+	 Add(new cMenuEditIntItem(tr("Boblightd port"), &cfg.port));
 
    Add(new cMenuEditIntItem(tr("Updaterate [Hz]"), &cfg.frequence, 1, 15));
 

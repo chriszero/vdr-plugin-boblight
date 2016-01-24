@@ -45,6 +45,8 @@ cBobConfig::cBobConfig()
    autospeed = 0;
    interpolation = 1; //bool
    priority = 128;
+	 strn0cpy(host, "127.0.0.1", 16);
+	 port = 19333;
 
    detectCineBars = cbBoth;
    cineBarsThreshold = 20;

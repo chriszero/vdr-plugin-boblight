@@ -32,7 +32,7 @@ int cBoblight::open()
   m_boblight = boblight_init();
   tell(1, "Successfully loaded and initalized libboblight");
 
-   if (!boblight_connect(m_boblight, NULL, -1, 1000000) || !boblight_setpriority(m_boblight, cfg.priority))
+   if (!boblight_connect(m_boblight, cfg.host, cfg.port, 1000000) || !boblight_setpriority(m_boblight, cfg.priority))
     {
       tell(0, "Error connecting to boblight %s", boblight_geterror(m_boblight));
       close();
